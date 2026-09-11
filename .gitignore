@@ -1,0 +1,17 @@
+# Personal research data — company briefs, interview transcripts, story bank,
+# job queue, error logs. Regenerated locally; never committed.
+app/data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interview Research Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◆</span>
+      <div class="brand-text">
+        <h1>Interview Research Tracker</h1>
+        <span class="tag">local · private · runs on your Claude subscription</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="notify-btn" class="ghost icon-btn" title="Enable desktop notifications for stage completions">🔔</button>
+      <button id="usage-pill" class="ghost" title="Estimated tokens of generated content (click for breakdown)">🔢 ~0 tok</button>
+      <button id="story-bank-btn" class="ghost" title="Manage your reusable STAR stories">📚 Story Bank</button>
+      <button id="kill-switch" class="danger" title="Stop all queued work, end active interviews, and shut the server down">
+        ⛔ Kill switch
+      </button>
+    </div>
+  </header>
+
+  <div id="status-bar" class="idle"></div>
+
+  <main>
+    <!-- LEFT: company list + add -->
+    <aside id="sidebar">
+      <form id="add-form">
+        <h2>Add a company</h2>
+        <input id="add-name" type="text" placeholder="Company name or URL (e.g. Accenture)" required />
+        <input id="add-role" type="text" placeholder="Role (optional, e.g. Strategy Analyst)" />
+        <input id="add-region" type="text" placeholder="Region / country (optional, e.g. India, London)" />
+        <button type="submit">Add &amp; queue research</button>
+      </form>
+
+      <h2>Tracked companies</h2>
+      <ul id="company-list"><li class="muted">None yet.</li></ul>
+
+      <div id="queue-box">
+        <h2>Job queue <span id="queue-count" class="pill">0</span></h2>
+        <p class="hint">Queued jobs are processed in your Claude Code session
+          (see <code>PROCESSING_GUIDE.md</code>). Nothing runs on its own.</p>
+        <ul id="job-list"></ul>
+      </div>
+    </aside>
+
+    <!-- RIGHT: detail panel -->
+    <section id="detail">
+      <div id="empty-state" class="muted">
+        <p>Select a company on the left, or add one to begin.</p>
+      </div>
+      <div id="company-detail" hidden></div>
+    </section>
+  </main>
+
+  <div id="errors-bar" hidden></div>
+  <div id="toasts"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
