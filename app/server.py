@@ -111,14 +111,21 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    MAX_BODY = 2 * 1024 * 1024   # 2 MB cap — resumes/JDs are text, never huge
+
     def _body_json(self) -> dict:
-        length = int(self.headers.get("Content-Length", 0))
-        if not length:
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+        except (TypeError, ValueError):
             return {}
+        if length <= 0:
+            return {}
+        if length > self.MAX_BODY:
+            raise ValueError(f"request body too large ({length} bytes)")
         raw = self.rfile.read(length)
         try:
             return json.loads(raw.decode("utf-8"))
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, UnicodeDecodeError):
             return {}
 
     def _rate_ok(self, bucket: str) -> bool:
@@ -144,7 +151,27 @@ class Handler(BaseHTTPRequestHandler):
         pass  # quiet
 
     # ----- GET -------------------------------------------------------------
+    def _safely(self, fn):
+        """Run a route handler; turn a bad path segment into 400 and any other
+        error into a logged 500 — never leak a traceback to the client."""
+        try:
+            fn()
+        except ValueError as e:
+            self._send_json({"error": "bad request"}, 400)
+            st.log_error("request", f"{self.path}: {e}")
+        except BrokenPipeError:
+            pass
+        except Exception as e:  # noqa: BLE001
+            try:
+                self._send_json({"error": "internal error"}, 500)
+            except Exception:
+                pass
+            st.log_error("request", f"{self.path}: {type(e).__name__}: {e}")
+
     def do_GET(self):
+        self._safely(self._route_get)
+
+    def _route_get(self):
         if not self._rate_ok("read"):
             return
         parsed = urlparse(self.path)
@@ -207,6 +234,9 @@ class Handler(BaseHTTPRequestHandler):
 
     # ----- POST ------------------------------------------------------------
     def do_POST(self):
+        self._safely(self._route_post)
+
+    def _route_post(self):
         if not self._rate_ok("write"):
             return
         parsed = urlparse(self.path)

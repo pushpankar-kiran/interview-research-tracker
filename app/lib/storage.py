@@ -139,8 +139,20 @@ def validate_brief(brief: dict) -> list[str]:
 # Company CRUD
 # ---------------------------------------------------------------------------
 
+_SAFE_SEGMENT_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+
+def _safe_segment(seg: str) -> str:
+    """Reject path-traversal and injection. Slugs/session-ids come from URLs;
+    they are always simple identifiers, so enforce a strict allowlist and refuse
+    anything with separators, control chars, or '..'."""
+    seg = str(seg or "")
+    if seg in (".", "..") or ".." in seg or not _SAFE_SEGMENT_RE.match(seg):
+        raise ValueError(f"unsafe path segment: {seg!r}")
+    return seg
+
+
 def company_dir(slug: str) -> Path:
-    return COMPANIES / slug
+    return COMPANIES / _safe_segment(slug)
 
 
 def list_companies() -> list[dict]:
@@ -291,7 +303,7 @@ def stop_active_sessions() -> int:
 # ---------------------------------------------------------------------------
 
 def session_path(slug: str, session_id: str) -> Path:
-    return company_dir(slug) / "sessions" / f"{session_id}.json"
+    return company_dir(slug) / "sessions" / f"{_safe_segment(session_id)}.json"
 
 
 def get_session(slug: str, session_id: str) -> dict | None:

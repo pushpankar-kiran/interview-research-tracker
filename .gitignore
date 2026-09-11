@@ -2,6 +2,17 @@
 # job queue, error logs. Regenerated locally; never committed.
 app/data/
 
+# Secrets / credentials / environment — never commit
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials.json
+.credentials.json
+secrets.*
+*.local
+
 # Python
 __pycache__/
 *.py[cod]
