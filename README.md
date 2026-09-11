@@ -8,6 +8,12 @@ own Claude subscription with **no hosting cost and no API-key billing**.
 > Code session does the research on your subscription. Everything lives on your
 > machine.
 
+![Interview Research Tracker dashboard](docs/dashboard.png)
+
+*The dashboard: per-company brief with prep sources and source-linked recent
+news, plus tabs for questions, mock interview, story bank, history, and a
+printable prep pack.*
+
 ## Features
 
 **Research & tracking**

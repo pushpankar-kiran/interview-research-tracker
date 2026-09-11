@@ -848,5 +848,10 @@ function fmt(iso) {
 }
 
 // boot
-refreshSidebar();
-state.bootTimer = setInterval(refreshSidebar, 5000);
+(async () => {
+  await refreshSidebar();
+  // deep link: /?company=<slug> opens that company directly (bookmarkable)
+  const want = new URLSearchParams(location.search).get("company");
+  if (want) { try { await openCompany(want); } catch (_) {} }
+  state.bootTimer = setInterval(refreshSidebar, 5000);
+})();
